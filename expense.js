@@ -26,7 +26,8 @@ class Expense {
   set amount(value) {
     if (typeof value !== "number" || Number.isNaN(value)) {
       throw new Error("Input type must be a number");
-    } else if (value <= 0) {
+    }
+    if (value <= 0) {
       throw new Error("Amount has to be more than 0");
     }
     this.#amount = value;
@@ -38,7 +39,8 @@ class Expense {
   set currency(value) {
     if (!value) {
       throw new Error("Currency cannot be empty");
-    } else if (typeof value !== "string") {
+    }
+    if (typeof value !== "string") {
       throw new Error("Input type invalid");
     }
     this.#currency = value;
@@ -50,7 +52,8 @@ class Expense {
   set category(value) {
     if (!value) {
       throw new Error("Category cannot be empty");
-    } else if (typeof value !== "string") {
+    }
+    if (typeof value !== "string") {
       throw new Error("Invalid category entered");
     }
     this.#category = value;
@@ -62,7 +65,8 @@ class Expense {
   set date(value) {
     if (!value) {
       throw new Error("Date cannot be empty");
-    } else if (typeof value !== "string") {
+    }
+    if (typeof value !== "string") {
       throw new Error("Invalid date entered");
     }
     this.#date = value;
@@ -74,9 +78,12 @@ class Expense {
   set note(value) {
     if (!value) {
       value = "";
-    } else if (typeof value !== "string") {
+    }
+    if (typeof value !== "string") {
       throw new Error("Invalid note entered.");
     }
     this.#note = value;
   }
 }
+
+export default Expense;
