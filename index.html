@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Budget Tracker</title>
+  </head>
+  <body>
+    <section>
+      <h2>Add an Expense</h2>
+      <form id="addExpenseForm">
+        <label for="currency">Currency:</label>
+        <input type="text" id="currency" placeholder="Enter currency" />
+
+        <label for="amount">Amount:</label>
+        <input type="number" id="amount" placeholder="Enter amount" />
+
+        <label for="category">Category:</label>
+        <input type="text" id="category" placeholder="Enter category" />
+
+        <label for="date">Date:</label>
+        <input type="date" id="date" placeholder="Enter date" />
+
+        <label for="note">Note:</label>
+        <input type="text" id="note" placeholder="Enter note" />
+
+        <button type="submit">Add Expense</button>
+        <p id="errorMessage"></p>
+      </form>
+    </section>
+    <section>
+      <h2>Expense List</h2>
+      <div id="expenseList"></div>
+    </section>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
