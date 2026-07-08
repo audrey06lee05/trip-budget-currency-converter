@@ -5,30 +5,24 @@ const expenseManager = new ExpenseManager();
 // Add Expense Form
 const addExpenseForm = document.getElementById("addExpenseForm");
 const errorMessage = document.getElementById("errorMessage");
+function getExpenseDataFromForm() {
+  return {
+    currency: document.getElementById("currency").value,
+    amount: Number(document.getElementById("amount").value),
+    category: document.getElementById("category").value,
+    date: document.getElementById("date").value,
+    note: document.getElementById("note").value,
+  };
+}
+
 addExpenseForm.addEventListener("submit", (event) => {
   event.preventDefault(); // preventing reload
   try {
-    // expenseData object
-    const currency = document.getElementById("currency").value;
-    const amount = Number(document.getElementById("amount").value);
-    const category = document.getElementById("category").value;
-    const date = document.getElementById("date").value;
-    const note = document.getElementById("note").value;
-
-    const expenseData = {
-      currency,
-      amount,
-      category,
-      date,
-      note,
-    };
-    const createdExpense = expenseManager.addExpense(expenseData);
+    const expenseData = getExpenseDataFromForm();
+    expenseManager.addExpense(expenseData);
     addExpenseForm.reset();
     renderExpenses();
     errorMessage.textContent = "";
-
-    console.log("Expense created: ", createdExpense);
-    console.log(expenseManager.getExpenses());
   } catch (error) {
     errorMessage.textContent = error.message;
   }
@@ -83,6 +77,27 @@ function editExpenseCard(id) {
 
 // edit / delete expense card button
 const expenseList = document.getElementById("expenseList");
+function getUpdatedExpenseDataFromEditForm(id) {
+  return {
+    currency: document.getElementById(`edit-currency-${id}`).value,
+    amount: Number(document.getElementById(`edit-amount-${id}`).value),
+    category: document.getElementById(`edit-category-${id}`).value,
+    date: document.getElementById(`edit-date-${id}`).value,
+    note: document.getElementById(`edit-note-${id}`).value,
+  };
+}
+
+function cancelEdit() {
+  editingExpenseId = null;
+  renderExpenses();
+}
+
+function confirmEdit(id) {
+  const updatedExpense = getUpdatedExpenseDataFromEditForm(id);
+  expenseManager.updateExpense(id, updatedExpense);
+  editingExpenseId = null;
+  renderExpenses();
+}
 
 expenseList.addEventListener("click", (event) => {
   try {
@@ -92,20 +107,10 @@ expenseList.addEventListener("click", (event) => {
     } else if (event.target.classList.contains("edit-btn")) {
       editExpenseCard(Number(event.target.dataset.id));
     } else if (event.target.classList.contains("cancel-edit-btn")) {
-      editingExpenseId = null;
-      renderExpenses();
+      cancelEdit();
     } else if (event.target.classList.contains("confirm-edit-btn")) {
       const id = Number(event.target.dataset.id);
-      const updatedExpense = {
-        currency: document.getElementById(`edit-currency-${id}`).value,
-        amount: Number(document.getElementById(`edit-amount-${id}`).value),
-        category: document.getElementById(`edit-category-${id}`).value,
-        date: document.getElementById(`edit-date-${id}`).value,
-        note: document.getElementById(`edit-note-${id}`).value,
-      };
-      expenseManager.updateExpense(Number(id), updatedExpense);
-      editingExpenseId = null;
-      renderExpenses();
+      confirmEdit(id);
     }
   } catch (error) {
     const editCardErrorMessage = document.getElementById(
