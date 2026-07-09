@@ -1,7 +1,6 @@
 import ExpenseManager from "./expenseManager.js";
 
 const expenseManager = new ExpenseManager();
-
 // Add Expense Form
 const addExpenseForm = document.getElementById("addExpenseForm");
 const errorMessage = document.getElementById("errorMessage");
@@ -119,3 +118,5 @@ expenseList.addEventListener("click", (event) => {
     editCardErrorMessage.textContent = error.message;
   }
 });
+
+renderExpenses();
