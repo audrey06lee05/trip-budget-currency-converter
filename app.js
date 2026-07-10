@@ -1,8 +1,10 @@
 import ExpenseManager from "./expenseManager.js";
 import FrankfurterClient from "./frankfurterClient.js";
+import CurrencyConversionService from "./currencyConversionService.js";
 
 const expenseManager = new ExpenseManager();
 const frankfurterClient = new FrankfurterClient();
+const currencyConversionService = new CurrencyConversionService(frankfurterClient);
 
 // API
 async function loadCurrencyOptionsFromApi() {
@@ -73,6 +75,7 @@ baseCurrencySelect.addEventListener("change", () => {
   updateConversionPreview();
   renderExpenses();
   renderTotalSpend();
+  renderCategoryBreakdown();
 });
 
 // Category dropdown
@@ -199,6 +202,7 @@ addExpenseForm.addEventListener("submit", (event) => {
     document.getElementById("conversionPreview").textContent = "";
     renderExpenses();
     renderTotalSpend();
+    renderCategoryBreakdown();
     errorMessage.textContent = "";
   } catch (error) {
     errorMessage.textContent = error.message;
@@ -269,6 +273,7 @@ function deleteExpenseCard(id) {
   expenseManager.deleteExpense(id);
   renderExpenses(expenseManager.getExpenses());
   renderTotalSpend();
+  renderCategoryBreakdown();
 }
 
 // edit expense card
@@ -301,6 +306,7 @@ function confirmEdit(id) {
   editingExpenseId = null;
   renderExpenses();
   renderTotalSpend();
+  renderCategoryBreakdown();
 }
 
 expenseList.addEventListener("click", (event) => {
@@ -362,3 +368,35 @@ async function renderTotalSpend() {
   totalSpend.textContent = `Total spend: ${total.toFixed(2)} ${baseCurrency}`;
 }
 renderTotalSpend();
+
+// category breakdown
+async function renderCategoryBreakdown() {
+  const expenses = expenseManager.getExpenses();
+  const baseCurrency = document.getElementById("baseCurrency").value;
+  const categoryBreakdown = document.getElementById("categoryBreakdown");
+
+  if (!baseCurrency || expenses.length === 0) {
+    categoryBreakdown.innerHTML = "";
+    return;
+  }
+
+  try {
+    const summary = await currencyConversionService.calculateBudgetSummary(
+      expenses,
+      baseCurrency,
+    );
+
+    categoryBreakdown.innerHTML = Object.entries(summary)
+      .map(
+        ([category, total]) =>
+          `<div class="category-card">
+            <p>${category}</p>
+            <p>${total.toFixed(2)} ${baseCurrency}</p>
+          </div>`,
+      )
+      .join("");
+  } catch {
+    categoryBreakdown.innerHTML = "<p>Error loading category breakdown</p>";
+  }
+}
+renderCategoryBreakdown();
