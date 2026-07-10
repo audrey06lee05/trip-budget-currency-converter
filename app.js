@@ -75,6 +75,103 @@ baseCurrencySelect.addEventListener("change", () => {
   renderTotalSpend();
 });
 
+// Category dropdown
+const PREDEFINED_CATEGORIES = [
+  "Transport",
+  "Accommodation",
+  "Food & Drinks",
+  "Activities",
+  "Shopping",
+];
+
+function loadCustomCategories() {
+  const saved = localStorage.getItem("tripBudgetCustomCategories");
+  return saved ? JSON.parse(saved) : [];
+}
+
+function saveCustomCategories(categories) {
+  localStorage.setItem("tripBudgetCustomCategories", JSON.stringify(categories));
+}
+
+function renderCategoryOptions() {
+  const categorySelect = document.getElementById("category");
+  const customCategories = loadCustomCategories();
+
+  categorySelect.innerHTML = '<option value="">Choose Category</option>';
+
+  PREDEFINED_CATEGORIES.forEach((cat) => {
+    const option = document.createElement("option");
+    option.value = cat;
+    option.textContent = cat;
+    categorySelect.appendChild(option);
+  });
+
+  customCategories.forEach((cat) => {
+    const option = document.createElement("option");
+    option.value = cat;
+    option.textContent = `${cat} (custom)`;
+    categorySelect.appendChild(option);
+  });
+
+  const addCustomOption = document.createElement("option");
+  addCustomOption.value = "__add_custom__";
+  addCustomOption.textContent = "+ Add custom...";
+  categorySelect.appendChild(addCustomOption);
+}
+
+renderCategoryOptions();
+
+const categorySelect = document.getElementById("category");
+const customCategoryInput = document.getElementById("customCategoryInput");
+const deleteCustomCategoryBtn = document.getElementById("deleteCustomCategoryBtn");
+
+categorySelect.addEventListener("change", () => {
+  const value = categorySelect.value;
+
+  if (value === "__add_custom__") {
+    customCategoryInput.style.display = "block";
+    deleteCustomCategoryBtn.style.display = "none";
+    document.getElementById("customCategoryText").value = "";
+    document.getElementById("customCategoryText").focus();
+  } else {
+    customCategoryInput.style.display = "none";
+    const customCategories = loadCustomCategories();
+    deleteCustomCategoryBtn.style.display = customCategories.includes(value) ? "block" : "none";
+  }
+});
+
+document.getElementById("addCustomCategoryBtn").addEventListener("click", () => {
+  const newCategory = document.getElementById("customCategoryText").value.trim();
+  if (!newCategory) return;
+
+  const customCategories = loadCustomCategories();
+  const alreadyExists =
+    PREDEFINED_CATEGORIES.includes(newCategory) || customCategories.includes(newCategory);
+
+  if (!alreadyExists) {
+    customCategories.push(newCategory);
+    saveCustomCategories(customCategories);
+  }
+
+  renderCategoryOptions();
+  categorySelect.value = newCategory;
+  customCategoryInput.style.display = "none";
+  deleteCustomCategoryBtn.style.display = "block";
+});
+
+document.getElementById("cancelCustomCategoryBtn").addEventListener("click", () => {
+  customCategoryInput.style.display = "none";
+  categorySelect.value = "";
+});
+
+deleteCustomCategoryBtn.addEventListener("click", () => {
+  const value = categorySelect.value;
+  const customCategories = loadCustomCategories().filter((cat) => cat !== value);
+  saveCustomCategories(customCategories);
+  renderCategoryOptions();
+  deleteCustomCategoryBtn.style.display = "none";
+});
+
 // Add Expense Form
 const addExpenseForm = document.getElementById("addExpenseForm");
 const errorMessage = document.getElementById("errorMessage");
@@ -82,7 +179,7 @@ function getExpenseDataFromForm() {
   return {
     currency: document.getElementById("currency").value,
     amount: Number(document.getElementById("amount").value),
-    category: document.getElementById("category").value,
+    category: document.getElementById("category").value === "__add_custom__" ? "" : document.getElementById("category").value,
     date: document.getElementById("date").value,
     note: document.getElementById("note").value,
   };
@@ -96,6 +193,9 @@ addExpenseForm.addEventListener("submit", (event) => {
     localStorage.setItem("tripBudgetLastCurrency", expenseData.currency);
     renderLastUsedCurrencyOption(expenseData.currency, currencySelect);
     addExpenseForm.reset();
+    renderCategoryOptions();
+    customCategoryInput.style.display = "none";
+    deleteCustomCategoryBtn.style.display = "none";
     document.getElementById("conversionPreview").textContent = "";
     renderExpenses();
     renderTotalSpend();

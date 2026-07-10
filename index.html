@@ -27,7 +27,15 @@
         <p id="conversionPreview"></p>
 
         <label for="category">Category:</label>
-        <input type="text" id="category" placeholder="Enter category" />
+        <select id="category">
+          <option value="">Choose Category</option>
+        </select>
+        <div id="customCategoryInput" style="display:none">
+          <input type="text" id="customCategoryText" placeholder="Enter custom category name" />
+          <button type="button" id="addCustomCategoryBtn">Add</button>
+          <button type="button" id="cancelCustomCategoryBtn">Cancel</button>
+        </div>
+        <button type="button" id="deleteCustomCategoryBtn" style="display:none">Delete custom category</button>
 
         <label for="date">Date:</label>
         <input type="date" id="date" placeholder="Enter date" />
