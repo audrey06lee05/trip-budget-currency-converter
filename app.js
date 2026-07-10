@@ -260,18 +260,36 @@ function renderCard(expense) {
         </div>`;
 }
 
+const EXPENSE_PAGE_SIZE = 5;
+let isExpenseListExpanded = false;
+
 function renderExpenses(expenses = expenseManager.getExpenses()) {
   const expenseList = document.getElementById("expenseList");
+  const toggleBtn = document.getElementById("toggleExpenseList");
+  const hasMore = expenses.length > EXPENSE_PAGE_SIZE;
+  const visibleExpenses =
+    isExpenseListExpanded || !hasMore ? expenses : expenses.slice(0, EXPENSE_PAGE_SIZE);
+
   expenseList.innerHTML = "";
-  expenses.forEach((expense) => {
+  visibleExpenses.forEach((expense) => {
     expenseList.innerHTML += renderCard(expense);
   });
-  expenses.forEach((expense) => {
+  visibleExpenses.forEach((expense) => {
     renderConvertedExpenseAmount(expense);
   });
   if (editingExpenseId !== null) {
-    const editingExpense = expenses.find((e) => e.id === editingExpenseId);
+    const editingExpense = visibleExpenses.find((e) => e.id === editingExpenseId);
     if (editingExpense) populateEditForm(editingExpense);
+  }
+
+  if (hasMore) {
+    const hidden = expenses.length - EXPENSE_PAGE_SIZE;
+    toggleBtn.style.display = "block";
+    toggleBtn.textContent = isExpenseListExpanded
+      ? "Show less ▲"
+      : `Show ${hidden} more ▼`;
+  } else {
+    toggleBtn.style.display = "none";
   }
 }
 
@@ -379,6 +397,11 @@ function getUpdatedExpenseDataFromEditForm(id) {
     note: document.getElementById(`edit-note-${id}`).value,
   };
 }
+
+document.getElementById("toggleExpenseList").addEventListener("click", () => {
+  isExpenseListExpanded = !isExpenseListExpanded;
+  renderExpenses();
+});
 
 function cancelEdit() {
   editingExpenseId = null;

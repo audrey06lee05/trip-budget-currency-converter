@@ -280,6 +280,25 @@ button[type="submit"] {
   flex-shrink: 0;
 }
 
+/* Toggle expense list button */
+#toggleExpenseList {
+  display: block;
+  width: 100%;
+  margin-top: 0.75rem;
+  background: none;
+  border: 1.5px solid #e5e7eb;
+  color: #6b7280;
+  font-size: 0.85rem;
+  padding: 0.6rem;
+  border-radius: 10px;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+#toggleExpenseList:hover {
+  border-color: #4f46e5;
+  color: #4f46e5;
+}
+
 /* Edit card */
 .edited-expense-card {
   display: flex;
