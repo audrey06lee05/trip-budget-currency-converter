@@ -25,6 +25,22 @@ class CurrencyConversionService {
     );
   }
 
+  async getDailySpend(expenses, baseCurrency) {
+    const dailyTotals = {};
+
+    for (const expense of expenses) {
+      const converted = await this.convertExpense(expense, baseCurrency);
+      if (!dailyTotals[expense.date]) {
+        dailyTotals[expense.date] = 0;
+      }
+      dailyTotals[expense.date] += converted;
+    }
+
+    return Object.entries(dailyTotals)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, total]) => ({ date, total }));
+  }
+
   async calculateBudgetSummary(expenses, baseCurrency) {
     const grouped = this.groupByCategory(expenses);
     const summary = {};

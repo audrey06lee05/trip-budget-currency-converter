@@ -25,6 +25,7 @@ async function loadCurrencyOptionsFromApi() {
     renderExpenses();
     renderTotalSpend();
     renderCategoryBreakdown();
+    renderDailySpendChart();
   }
 }
 loadCurrencyOptionsFromApi();
@@ -88,6 +89,7 @@ baseCurrencySelect.addEventListener("change", () => {
   renderExpenses();
   renderTotalSpend();
   renderCategoryBreakdown();
+  renderDailySpendChart();
 });
 
 // Category dropdown
@@ -215,6 +217,7 @@ addExpenseForm.addEventListener("submit", (event) => {
     renderExpenses();
     renderTotalSpend();
     renderCategoryBreakdown();
+  renderDailySpendChart();
     errorMessage.textContent = "";
   } catch (error) {
     errorMessage.textContent = error.message;
@@ -238,14 +241,22 @@ function renderCard(expense) {
   }
   return `
         <div class="expense-card">
-            <p>${expense.currency}</p>
-            <p>${expense.amount}</p>
-            <p id="converted-expense-${expense.id}"></p>
-            <p>${expense.category}</p>
-            <p>${expense.date}</p>
-            <p>${expense.note}</p>
-            <button class="delete-btn" data-id="${expense.id}">Delete</button> 
-            <button class="edit-btn" data-id="${expense.id}">Edit</button> 
+            <div class="expense-amounts">
+                <div class="expense-original">
+                    <span class="expense-currency">${expense.currency}</span>
+                    <span class="expense-amount">${expense.amount}</span>
+                </div>
+                <div class="expense-converted" id="converted-expense-${expense.id}"></div>
+            </div>
+            <div class="expense-meta">
+                <span class="expense-category">${expense.category}</span>
+                <span class="expense-date">${expense.date}</span>
+                ${expense.note ? `<span class="expense-note" data-note="${expense.note}">${expense.note}</span>` : ""}
+            </div>
+            <div class="expense-actions">
+                <button class="delete-btn" data-id="${expense.id}">Delete</button>
+                <button class="edit-btn" data-id="${expense.id}">Edit</button>
+            </div>
         </div>`;
 }
 
@@ -335,7 +346,10 @@ async function renderConvertedExpenseAmount(expense) {
     expense.date,
   );
 
-  convertedExpenseText.textContent = `≈ ${convertedAmount.toFixed(2)} ${baseCurrency} (rate from ${expense.date})`;
+  convertedExpenseText.innerHTML = `
+    <span class="converted-amount">≈ ${convertedAmount.toFixed(2)} ${baseCurrency}</span>
+    <span class="rate-date">rate from ${expense.date}</span>
+  `;
 }
 
 // delete expense card
@@ -344,6 +358,7 @@ function deleteExpenseCard(id) {
   renderExpenses(expenseManager.getExpenses());
   renderTotalSpend();
   renderCategoryBreakdown();
+  renderDailySpendChart();
 }
 
 // edit expense card
@@ -377,6 +392,7 @@ function confirmEdit(id) {
   renderExpenses();
   renderTotalSpend();
   renderCategoryBreakdown();
+  renderDailySpendChart();
 }
 
 expenseList.addEventListener("click", (event) => {
@@ -472,3 +488,97 @@ async function renderCategoryBreakdown() {
   }
 }
 renderCategoryBreakdown();
+  renderDailySpendChart();
+
+// Daily spend chart
+let dailySpendChart = null;
+
+async function renderDailySpendChart() {
+  const expenses = expenseManager.getExpenses();
+  const baseCurrency = document.getElementById("baseCurrency").value;
+
+  if (!baseCurrency || expenses.length === 0) {
+    if (dailySpendChart) {
+      dailySpendChart.destroy();
+      dailySpendChart = null;
+    }
+    return;
+  }
+
+  try {
+    const dailySpend = await currencyConversionService.getDailySpend(expenses, baseCurrency);
+    const labels = dailySpend.map((d) => d.date);
+    const data = dailySpend.map((d) => parseFloat(d.total.toFixed(2)));
+
+    if (dailySpendChart) {
+      dailySpendChart.destroy();
+    }
+
+    const ctx = document.getElementById("dailySpendChart").getContext("2d");
+    dailySpendChart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          {
+            data,
+            borderColor: "#4f46e5",
+            backgroundColor: "rgba(79, 70, 229, 0.08)",
+            fill: true,
+            tension: 0.3,
+            pointBackgroundColor: "#4f46e5",
+            pointRadius: 4,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => `${ctx.parsed.y.toFixed(2)} ${baseCurrency}`,
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: (value) => `${value} ${baseCurrency}`,
+            },
+            grid: { color: "#f3f4f6" },
+          },
+          x: {
+            grid: { display: false },
+          },
+        },
+      },
+    });
+  } catch {
+    // silently skip if conversion fails
+  }
+}
+renderDailySpendChart();
+
+// Note modal
+const noteModal = document.getElementById("noteModal");
+const noteModalText = document.getElementById("noteModalText");
+
+function openNoteModal(text) {
+  noteModalText.textContent = text;
+  noteModal.style.display = "flex";
+}
+
+function closeNoteModal() {
+  noteModal.style.display = "none";
+}
+
+document.getElementById("noteModalClose").addEventListener("click", closeNoteModal);
+document.getElementById("noteModalBackdrop").addEventListener("click", closeNoteModal);
+
+expenseList.addEventListener("click", (event) => {
+  const note = event.target.closest(".expense-note");
+  if (!note) return;
+  openNoteModal(note.dataset.note);
+});

@@ -1,0 +1,409 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+header,
+section {
+  max-width: 680px;
+  margin: 0 auto 1.5rem;
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.75rem 2rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+}
+
+/* Header */
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+header label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+header select {
+  width: auto;
+}
+
+#totalSpend {
+  width: 100%;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #4f46e5;
+  padding-top: 0.25rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Section headings */
+h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.01em;
+}
+
+/* Form */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.5rem;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 0.65rem 0.875rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: #1d1d1f;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s;
+  appearance: auto;
+}
+
+input:focus,
+select:focus {
+  border-color: #4f46e5;
+}
+
+input::placeholder {
+  color: #9ca3af;
+}
+
+/* Conversion preview */
+#conversionPreview {
+  font-size: 0.85rem;
+  color: #4f46e5;
+  font-weight: 500;
+  min-height: 1.2rem;
+  padding-left: 0.25rem;
+}
+
+/* Custom category */
+#customCategoryInput {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+#customCategoryInput input {
+  flex: 1;
+  margin: 0;
+}
+
+/* Buttons */
+button {
+  padding: 0.65rem 1.25rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+button[type="submit"] {
+  background: #4f46e5;
+  color: #fff;
+  margin-top: 0.5rem;
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 0.95rem;
+}
+
+#addCustomCategoryBtn {
+  background: #4f46e5;
+  color: #fff;
+  white-space: nowrap;
+}
+
+#cancelCustomCategoryBtn {
+  background: #f3f4f6;
+  color: #374151;
+  white-space: nowrap;
+}
+
+#deleteCustomCategoryBtn {
+  background: #fef2f2;
+  color: #dc2626;
+  font-size: 0.8rem;
+  padding: 0.5rem 1rem;
+  margin-top: 0.25rem;
+}
+
+/* Error */
+#errorMessage {
+  font-size: 0.82rem;
+  color: #dc2626;
+  min-height: 1.2rem;
+  padding-left: 0.25rem;
+}
+
+/* Expense list */
+#expenseList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.expense-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 1.25rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  transition: border-color 0.15s;
+}
+
+.expense-card:hover {
+  border-color: #c7d2fe;
+}
+
+.expense-amounts {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.expense-original {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.expense-currency {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+}
+
+.expense-amount {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1d1d1f;
+}
+
+.expense-converted {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding-left: 1rem;
+  border-left: 1.5px solid #e5e7eb;
+}
+
+.converted-amount {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #4f46e5;
+}
+
+.rate-date {
+  font-size: 0.7rem;
+  color: #9ca3af;
+}
+
+.expense-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-left: auto;
+  text-align: right;
+  max-width: 180px;
+  min-width: 0;
+}
+
+.expense-category {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.expense-date {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.expense-note {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.expense-note:hover {
+  color: #4f46e5;
+}
+
+.expense-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Edit card */
+.edited-expense-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1.25rem;
+  border: 1.5px solid #4f46e5;
+  border-radius: 12px;
+  background: #fafafe;
+}
+
+#edit-conversion-preview {
+  font-size: 0.85rem;
+  color: #4f46e5;
+  font-weight: 500;
+  padding-left: 0.25rem;
+}
+
+/* Expense card buttons */
+.delete-btn {
+  background: #fef2f2;
+  color: #dc2626;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.75rem;
+}
+
+.edit-btn {
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.75rem;
+}
+
+.confirm-edit-btn {
+  background: #4f46e5;
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.cancel-edit-btn {
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 0.85rem;
+}
+
+.edited-expense-card [class$="-btn"] {
+  align-self: flex-start;
+}
+
+/* Inline edit buttons row */
+.edited-expense-card .confirm-edit-btn,
+.edited-expense-card .cancel-edit-btn {
+  display: inline-block;
+  width: auto;
+}
+
+/* Note modal */
+#noteModal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+#noteModalBackdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(2px);
+}
+
+#noteModalContent {
+  position: relative;
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+#noteModalText {
+  font-size: 0.95rem;
+  color: #374151;
+  line-height: 1.6;
+}
+
+#noteModalClose {
+  background: #f3f4f6;
+  color: #374151;
+  align-self: flex-end;
+}
+
+
+/* Category breakdown */
+#categoryBreakdown {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.category-card {
+  background: #f5f5f7;
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.category-card p:first-child {
+  font-size: 0.72rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.category-card p:last-child {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #4f46e5;
+}

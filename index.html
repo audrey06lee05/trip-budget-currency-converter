@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Budget Tracker</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
     <header>
@@ -55,6 +57,17 @@
       <h2>Category Breakdown</h2>
       <div id="categoryBreakdown"></div>
     </section>
+    <section>
+      <h2>Daily Spend</h2>
+      <canvas id="dailySpendChart"></canvas>
+    </section>
+    <div id="noteModal" style="display:none">
+      <div id="noteModalBackdrop"></div>
+      <div id="noteModalContent">
+        <p id="noteModalText"></p>
+        <button id="noteModalClose">Close</button>
+      </div>
+    </div>
     <script type="module" src="app.js"></script>
   </body>
 </html>
