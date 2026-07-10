@@ -1,6 +1,27 @@
 import ExpenseManager from "./expenseManager.js";
+import FrankfurterClient from "./frankfurterClient.js";
 
 const expenseManager = new ExpenseManager();
+const frankfurterClient = new FrankfurterClient();
+
+async function loadCurrencyOptionsFromApi() {
+  const currencyList = await frankfurterClient.getCurrencyList();
+  renderCurrencyOptions(currencyList);
+}
+loadCurrencyOptionsFromApi();
+
+// currency options dropdown
+function renderCurrencyOptions(currencyList) {
+  const currencySelect = document.getElementById("currency");
+  currencyList.forEach((currency) => {
+    const optionText = `${currency.iso_code} - ${currency.name}`;
+    const option = document.createElement("option");
+    option.value = currency.iso_code;
+    option.textContent = optionText;
+    currencySelect.appendChild(option);
+  });
+}
+
 // Add Expense Form
 const addExpenseForm = document.getElementById("addExpenseForm");
 const errorMessage = document.getElementById("errorMessage");
