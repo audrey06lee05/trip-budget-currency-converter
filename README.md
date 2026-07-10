@@ -31,18 +31,16 @@ The app is structured around four core classes:
 | `ExpenseManager` | CRUD operations for expenses with localStorage persistence |
 | `CurrencyConversionService` | Converts expenses using historical rates, groups by category, calculates budget summaries and daily spend |
 
-## 🚀 Deployment
-The app is deployed via **GitHub Pages** — no build step or server required.
+## 🌐 Live Demo
+**[https://audrey06lee05.github.io/trip-budget-currency-converter/](https://audrey06lee05.github.io/trip-budget-currency-converter/)**
 
-To deploy your own copy:
-1. Push the repository to GitHub
-2. Go to **Settings → Pages**
-3. Set source to your main branch, root folder (`/`)
-4. GitHub Pages will publish it at `https://<your-username>.github.io/trip-budget-currency-converter/`
+Deployed via GitHub Pages — no build step or server required.
 
-## 🔧 Running Locally
+## 🔧 Running Locally (for development)
+ES Modules require an HTTP server — opening `index.html` directly via `file://` won't work.
+
 1. Clone the repository
-2. Serve it with a local HTTP server — ES Modules require HTTP, not `file://`
+2. Serve with a local HTTP server:
    * VS Code: use the **Live Server** extension
    * Terminal: run `npx serve .`
 3. Select a base currency from the header dropdown to get started
