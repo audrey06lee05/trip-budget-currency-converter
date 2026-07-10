@@ -72,6 +72,7 @@ currencySelect.addEventListener("change", updateConversionPreview);
 baseCurrencySelect.addEventListener("change", () => {
   updateConversionPreview();
   renderExpenses();
+  renderTotalSpend();
 });
 
 // Add Expense Form
@@ -97,6 +98,7 @@ addExpenseForm.addEventListener("submit", (event) => {
     addExpenseForm.reset();
     document.getElementById("conversionPreview").textContent = "";
     renderExpenses();
+    renderTotalSpend();
     errorMessage.textContent = "";
   } catch (error) {
     errorMessage.textContent = error.message;
@@ -165,6 +167,7 @@ async function renderConvertedExpenseAmount(expense) {
 function deleteExpenseCard(id) {
   expenseManager.deleteExpense(id);
   renderExpenses(expenseManager.getExpenses());
+  renderTotalSpend();
 }
 
 // edit expense card
@@ -196,6 +199,7 @@ function confirmEdit(id) {
   expenseManager.updateExpense(id, updatedExpense);
   editingExpenseId = null;
   renderExpenses();
+  renderTotalSpend();
 }
 
 expenseList.addEventListener("click", (event) => {
@@ -220,3 +224,39 @@ expenseList.addEventListener("click", (event) => {
 });
 
 renderExpenses();
+
+// total spent
+async function renderTotalSpend() {
+  const expenses = expenseManager.getExpenses();
+  const baseCurrency = document.getElementById("baseCurrency").value;
+  const totalSpend = document.getElementById("totalSpend");
+
+  if (!baseCurrency) {
+    totalSpend.textContent = "Please choose a base currency";
+    return;
+  }
+
+  if (expenses.length === 0) {
+    totalSpend.textContent = `Total spend: 0.00 ${baseCurrency}`;
+    return;
+  }
+
+  let total = 0;
+
+  for (const expense of expenses) {
+    try {
+      const convertedAmount = await frankfurterClient.convertAmount(
+        expense.amount,
+        expense.currency,
+        baseCurrency,
+      );
+      total += convertedAmount;
+    } catch {
+      totalSpend.textContent = `Error converting ${expense.currency} to ${baseCurrency}`;
+      return;
+    }
+  }
+
+  totalSpend.textContent = `Total spend: ${total.toFixed(2)} ${baseCurrency}`;
+}
+renderTotalSpend();
