@@ -10,12 +10,7 @@ async function loadCurrencyOptionsFromApi() {
   const currency = document.getElementById("currency");
   const lastCurrency = localStorage.getItem("tripBudgetLastCurrency");
   const baseCurrency = document.getElementById("baseCurrency");
-  if (lastCurrency) {
-    const option = document.createElement("option");
-    option.value = lastCurrency;
-    option.textContent = `Last used: ${lastCurrency}`;
-    currency.appendChild(option);
-  }
+  renderLastUsedCurrencyOption(lastCurrency, currency);
   renderCurrencyOptions(currencyList, currency);
   renderCurrencyOptions(currencyList, baseCurrency);
 }
@@ -30,6 +25,22 @@ function renderCurrencyOptions(currencyList, currencySelect) {
     option.textContent = optionText;
     currencySelect.appendChild(option);
   });
+}
+
+function renderLastUsedCurrencyOption(lastCurrency, currencySelect) {
+  const oldLastUsedOption = document.getElementById("lastUsedCurrencyOption");
+
+  if (oldLastUsedOption) {
+    oldLastUsedOption.remove();
+  }
+
+  if (lastCurrency) {
+    const option = document.createElement("option");
+    option.value = lastCurrency;
+    option.textContent = `Last used: ${lastCurrency}`;
+    option.id = "lastUsedCurrencyOption";
+    currencySelect.insertBefore(option, currencySelect.children[1]);
+  }
 }
 
 async function updateConversionPreview() {
@@ -58,7 +69,10 @@ amountInput.addEventListener("input", updateConversionPreview);
 const currencySelect = document.getElementById("currency");
 const baseCurrencySelect = document.getElementById("baseCurrency");
 currencySelect.addEventListener("change", updateConversionPreview);
-baseCurrencySelect.addEventListener("change", updateConversionPreview);
+baseCurrencySelect.addEventListener("change", () => {
+  updateConversionPreview();
+  renderExpenses();
+});
 
 // Add Expense Form
 const addExpenseForm = document.getElementById("addExpenseForm");
@@ -79,6 +93,7 @@ addExpenseForm.addEventListener("submit", (event) => {
     const expenseData = getExpenseDataFromForm();
     expenseManager.addExpense(expenseData);
     localStorage.setItem("tripBudgetLastCurrency", expenseData.currency);
+    renderLastUsedCurrencyOption(expenseData.currency, currencySelect);
     addExpenseForm.reset();
     document.getElementById("conversionPreview").textContent = "";
     renderExpenses();
@@ -106,6 +121,7 @@ function renderCard(expense) {
         <div class="expense-card">
             <p>${expense.currency}</p>
             <p>${expense.amount}</p>
+            <p id="converted-expense-${expense.id}"></p>
             <p>${expense.category}</p>
             <p>${expense.date}</p>
             <p>${expense.note}</p>
@@ -120,6 +136,29 @@ function renderExpenses(expenses = expenseManager.getExpenses()) {
   expenses.forEach((expense) => {
     expenseList.innerHTML += renderCard(expense);
   });
+  expenses.forEach((expense) => {
+    renderConvertedExpenseAmount(expense);
+  });
+}
+
+async function renderConvertedExpenseAmount(expense) {
+  const baseCurrency = document.getElementById("baseCurrency").value;
+  const convertedExpenseText = document.getElementById(
+    `converted-expense-${expense.id}`,
+  );
+
+  if (!baseCurrency) {
+    convertedExpenseText.textContent = "";
+    return;
+  }
+
+  const convertedAmount = await frankfurterClient.convertAmount(
+    expense.amount,
+    expense.currency,
+    baseCurrency,
+  );
+
+  convertedExpenseText.textContent = `≈ ${convertedAmount.toFixed(2)} ${baseCurrency}`;
 }
 
 // delete expense card
