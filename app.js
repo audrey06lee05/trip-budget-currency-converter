@@ -4,15 +4,18 @@ import FrankfurterClient from "./frankfurterClient.js";
 const expenseManager = new ExpenseManager();
 const frankfurterClient = new FrankfurterClient();
 
+// API
 async function loadCurrencyOptionsFromApi() {
   const currencyList = await frankfurterClient.getCurrencyList();
-  renderCurrencyOptions(currencyList);
+  const currency = document.getElementById("currency");
+  const baseCurrency = document.getElementById("baseCurrency");
+  renderCurrencyOptions(currencyList, currency);
+  renderCurrencyOptions(currencyList, baseCurrency);
 }
 loadCurrencyOptionsFromApi();
 
 // currency options dropdown
-function renderCurrencyOptions(currencyList) {
-  const currencySelect = document.getElementById("currency");
+function renderCurrencyOptions(currencyList, currencySelect) {
   currencyList.forEach((currency) => {
     const optionText = `${currency.iso_code} - ${currency.name}`;
     const option = document.createElement("option");
@@ -21,6 +24,34 @@ function renderCurrencyOptions(currencyList) {
     currencySelect.appendChild(option);
   });
 }
+
+async function updateConversionPreview() {
+  const amountInput = document.getElementById("amount");
+  const amount = Number(amountInput.value);
+  const fromCurrency = document.getElementById("currency").value;
+  const baseCurrency = document.getElementById("baseCurrency").value;
+  const conversionPreview = document.getElementById("conversionPreview");
+
+  if (amount && fromCurrency && baseCurrency) {
+    const convertedAmount = await frankfurterClient.convertAmount(
+      amount,
+      fromCurrency,
+      baseCurrency,
+    );
+    conversionPreview.textContent = `≈ ${convertedAmount.toFixed(2)} ${baseCurrency}`;
+  } else {
+    conversionPreview.textContent = "";
+  }
+}
+
+// currency converter
+const amountInput = document.getElementById("amount");
+amountInput.addEventListener("input", updateConversionPreview);
+
+const currencySelect = document.getElementById("currency");
+const baseCurrencySelect = document.getElementById("baseCurrency");
+currencySelect.addEventListener("change", updateConversionPreview);
+baseCurrencySelect.addEventListener("change", updateConversionPreview);
 
 // Add Expense Form
 const addExpenseForm = document.getElementById("addExpenseForm");
@@ -41,6 +72,7 @@ addExpenseForm.addEventListener("submit", (event) => {
     const expenseData = getExpenseDataFromForm();
     expenseManager.addExpense(expenseData);
     addExpenseForm.reset();
+    document.getElementById("conversionPreview").textContent = "";
     renderExpenses();
     errorMessage.textContent = "";
   } catch (error) {

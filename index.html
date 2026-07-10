@@ -6,6 +6,12 @@
     <title>Budget Tracker</title>
   </head>
   <body>
+    <header>
+      <label for="baseCurrency">Base Currency:</label>
+      <select id="baseCurrency">
+        <option value="">Choose Base Currency</option>
+      </select>
+    </header>
     <section>
       <h2>Add an Expense</h2>
       <form id="addExpenseForm">
@@ -16,6 +22,8 @@
 
         <label for="amount">Amount:</label>
         <input type="number" id="amount" placeholder="Enter amount" />
+
+        <p id="conversionPreview"></p>
 
         <label for="category">Category:</label>
         <input type="text" id="category" placeholder="Enter category" />
