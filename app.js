@@ -6,15 +6,26 @@ const expenseManager = new ExpenseManager();
 const frankfurterClient = new FrankfurterClient();
 const currencyConversionService = new CurrencyConversionService(frankfurterClient);
 
+const today = new Date().toISOString().split("T")[0];
+document.getElementById("date").max = today;
+
 // API
+let currencyList = [];
 async function loadCurrencyOptionsFromApi() {
-  const currencyList = await frankfurterClient.getCurrencyList();
+  currencyList = await frankfurterClient.getCurrencyList();
   const currency = document.getElementById("currency");
   const lastCurrency = localStorage.getItem("tripBudgetLastCurrency");
   const baseCurrency = document.getElementById("baseCurrency");
   renderLastUsedCurrencyOption(lastCurrency, currency);
   renderCurrencyOptions(currencyList, currency);
   renderCurrencyOptions(currencyList, baseCurrency);
+  const savedBaseCurrency = localStorage.getItem("tripBudgetBaseCurrency");
+  if (savedBaseCurrency) {
+    baseCurrency.value = savedBaseCurrency;
+    renderExpenses();
+    renderTotalSpend();
+    renderCategoryBreakdown();
+  }
 }
 loadCurrencyOptionsFromApi();
 
@@ -72,6 +83,7 @@ const currencySelect = document.getElementById("currency");
 const baseCurrencySelect = document.getElementById("baseCurrency");
 currencySelect.addEventListener("change", updateConversionPreview);
 baseCurrencySelect.addEventListener("change", () => {
+  localStorage.setItem("tripBudgetBaseCurrency", baseCurrencySelect.value);
   updateConversionPreview();
   renderExpenses();
   renderTotalSpend();
@@ -213,13 +225,14 @@ function renderCard(expense) {
   if (expense.id === editingExpenseId) {
     return `
         <div class="edited-expense-card">
-            <input id="edit-currency-${expense.id}" value="${expense.currency}">
+            <select id="edit-currency-${expense.id}"></select>
             <input id="edit-amount-${expense.id}" type="number" value="${expense.amount}">
-            <input id="edit-category-${expense.id}" value="${expense.category}">
-            <input id="edit-date-${expense.id}" type="date" value="${expense.date}">
+            <p id="edit-conversion-preview-${expense.id}"></p>
+            <select id="edit-category-${expense.id}"></select>
+            <input id="edit-date-${expense.id}" type="date" max="${today}">
             <input id="edit-note-${expense.id}" value="${expense.note}">
-            <button class="confirm-edit-btn" data-id="${expense.id}">Confirm</button> 
-            <button class="cancel-edit-btn" data-id="${expense.id}">Cancel</button> 
+            <button class="confirm-edit-btn" data-id="${expense.id}">Confirm</button>
+            <button class="cancel-edit-btn" data-id="${expense.id}">Cancel</button>
             <p id="edit-error-${expense.id}"></p>
         </div>`;
   }
@@ -245,6 +258,61 @@ function renderExpenses(expenses = expenseManager.getExpenses()) {
   expenses.forEach((expense) => {
     renderConvertedExpenseAmount(expense);
   });
+  if (editingExpenseId !== null) {
+    const editingExpense = expenses.find((e) => e.id === editingExpenseId);
+    if (editingExpense) populateEditForm(editingExpense);
+  }
+}
+
+function populateEditForm(expense) {
+  const editCurrencySelect = document.getElementById(`edit-currency-${expense.id}`);
+  const editCategorySelect = document.getElementById(`edit-category-${expense.id}`);
+  const editAmountInput = document.getElementById(`edit-amount-${expense.id}`);
+  const editConversionPreview = document.getElementById(`edit-conversion-preview-${expense.id}`);
+
+  currencyList.forEach((currency) => {
+    const option = document.createElement("option");
+    option.value = currency.iso_code;
+    option.textContent = `${currency.iso_code} - ${currency.name}`;
+    editCurrencySelect.appendChild(option);
+  });
+  editCurrencySelect.value = expense.currency;
+  document.getElementById(`edit-date-${expense.id}`).value = expense.date;
+
+  editCategorySelect.innerHTML = '<option value="">Choose Category</option>';
+  PREDEFINED_CATEGORIES.forEach((cat) => {
+    const option = document.createElement("option");
+    option.value = cat;
+    option.textContent = cat;
+    editCategorySelect.appendChild(option);
+  });
+  loadCustomCategories().forEach((cat) => {
+    const option = document.createElement("option");
+    option.value = cat;
+    option.textContent = `${cat} (custom)`;
+    editCategorySelect.appendChild(option);
+  });
+  editCategorySelect.value = expense.category;
+
+  async function updateEditConversionPreview() {
+    const amount = Number(editAmountInput.value);
+    const fromCurrency = editCurrencySelect.value;
+    const baseCurrency = document.getElementById("baseCurrency").value;
+    if (amount && fromCurrency && baseCurrency) {
+      try {
+        const converted = await frankfurterClient.convertAmount(amount, fromCurrency, baseCurrency);
+        editConversionPreview.textContent = `≈ ${converted.toFixed(2)} ${baseCurrency}`;
+      } catch {
+        editConversionPreview.textContent = "";
+      }
+    } else {
+      editConversionPreview.textContent = "";
+    }
+  }
+
+  editAmountInput.addEventListener("input", updateEditConversionPreview);
+  editCurrencySelect.addEventListener("change", updateEditConversionPreview);
+  updateEditConversionPreview();
 }
 
 async function renderConvertedExpenseAmount(expense) {
@@ -252,6 +320,8 @@ async function renderConvertedExpenseAmount(expense) {
   const convertedExpenseText = document.getElementById(
     `converted-expense-${expense.id}`,
   );
+
+  if (!convertedExpenseText) return;
 
   if (!baseCurrency) {
     convertedExpenseText.textContent = "";
@@ -311,7 +381,9 @@ function confirmEdit(id) {
 
 expenseList.addEventListener("click", (event) => {
   try {
-    event.preventDefault(); // preventing reload
+    if (event.target.tagName === "BUTTON") {
+      event.preventDefault();
+    }
     if (event.target.classList.contains("delete-btn")) {
       deleteExpenseCard(Number(event.target.dataset.id));
     } else if (event.target.classList.contains("edit-btn")) {
