@@ -8,7 +8,14 @@ const frankfurterClient = new FrankfurterClient();
 async function loadCurrencyOptionsFromApi() {
   const currencyList = await frankfurterClient.getCurrencyList();
   const currency = document.getElementById("currency");
+  const lastCurrency = localStorage.getItem("tripBudgetLastCurrency");
   const baseCurrency = document.getElementById("baseCurrency");
+  if (lastCurrency) {
+    const option = document.createElement("option");
+    option.value = lastCurrency;
+    option.textContent = `Last used: ${lastCurrency}`;
+    currency.appendChild(option);
+  }
   renderCurrencyOptions(currencyList, currency);
   renderCurrencyOptions(currencyList, baseCurrency);
 }
@@ -71,6 +78,7 @@ addExpenseForm.addEventListener("submit", (event) => {
   try {
     const expenseData = getExpenseDataFromForm();
     expenseManager.addExpense(expenseData);
+    localStorage.setItem("tripBudgetLastCurrency", expenseData.currency);
     addExpenseForm.reset();
     document.getElementById("conversionPreview").textContent = "";
     renderExpenses();
