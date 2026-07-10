@@ -154,13 +154,14 @@ async function renderConvertedExpenseAmount(expense) {
     return;
   }
 
-  const convertedAmount = await frankfurterClient.convertAmount(
+  const convertedAmount = await frankfurterClient.convertAmountOnDate(
     expense.amount,
     expense.currency,
     baseCurrency,
+    expense.date,
   );
 
-  convertedExpenseText.textContent = `≈ ${convertedAmount.toFixed(2)} ${baseCurrency}`;
+  convertedExpenseText.textContent = `≈ ${convertedAmount.toFixed(2)} ${baseCurrency} (rate from ${expense.date})`;
 }
 
 // delete expense card
@@ -245,10 +246,11 @@ async function renderTotalSpend() {
 
   for (const expense of expenses) {
     try {
-      const convertedAmount = await frankfurterClient.convertAmount(
+      const convertedAmount = await frankfurterClient.convertAmountOnDate(
         expense.amount,
         expense.currency,
         baseCurrency,
+        expense.date,
       );
       total += convertedAmount;
     } catch {
