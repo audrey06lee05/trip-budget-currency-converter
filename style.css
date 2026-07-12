@@ -29,6 +29,28 @@ section {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
 }
 
+/* App heading */
+.app-heading {
+  max-width: 680px;
+  margin: 0 auto 1.25rem;
+}
+
+.app-heading p {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #4f46e5;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.35rem;
+}
+
+.app-heading h1 {
+  font-size: 2rem;
+  line-height: 1.1;
+  color: #1d1d1f;
+  letter-spacing: -0.02em;
+}
+
 /* Header */
 header {
   display: flex;
@@ -465,6 +487,20 @@ button[type="submit"] {
 @media (max-width: 600px) {
   body {
     padding: 1.25rem 0.75rem;
+  }
+
+  .app-heading {
+    margin-bottom: 1rem;
+  }
+
+  .app-heading p {
+    font-size: 0.7rem;
+  }
+
+  .app-heading h1 {
+    font-size: 1.6rem;
+    line-height: 1.15;
+    overflow-wrap: break-word;
   }
 
   header,
