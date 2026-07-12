@@ -231,11 +231,19 @@ function renderCard(expense) {
             <select id="edit-currency-${expense.id}"></select>
             <input id="edit-amount-${expense.id}" type="number" value="${expense.amount}">
             <p id="edit-conversion-preview-${expense.id}"></p>
-            <select id="edit-category-${expense.id}"></select>
-            <input id="edit-date-${expense.id}" type="date" max="${today}">
+            <div class="form-row">
+                <div class="form-col">
+                    <select id="edit-category-${expense.id}"></select>
+                </div>
+                <div class="form-col">
+                    <input id="edit-date-${expense.id}" type="date" max="${today}">
+                </div>
+            </div>
             <input id="edit-note-${expense.id}" value="${expense.note}">
-            <button class="confirm-edit-btn" data-id="${expense.id}">Confirm</button>
-            <button class="cancel-edit-btn" data-id="${expense.id}">Cancel</button>
+            <div class="edit-actions">
+                <button class="confirm-edit-btn" data-id="${expense.id}">Confirm</button>
+                <button class="cancel-edit-btn" data-id="${expense.id}">Cancel</button>
+            </div>
             <p id="edit-error-${expense.id}"></p>
         </div>`;
   }

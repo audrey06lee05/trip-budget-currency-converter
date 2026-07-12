@@ -28,19 +28,24 @@
 
         <p id="conversionPreview"></p>
 
-        <label for="category">Category:</label>
-        <select id="category">
-          <option value="">Choose Category</option>
-        </select>
-        <div id="customCategoryInput" style="display:none">
-          <input type="text" id="customCategoryText" placeholder="Enter custom category name" />
-          <button type="button" id="addCustomCategoryBtn">Add</button>
-          <button type="button" id="cancelCustomCategoryBtn">Cancel</button>
+        <div class="form-row">
+          <div class="form-col">
+            <label for="category">Category:</label>
+            <select id="category">
+              <option value="">Choose Category</option>
+            </select>
+            <div id="customCategoryInput" style="display:none">
+              <input type="text" id="customCategoryText" placeholder="Enter custom category name" />
+              <button type="button" id="addCustomCategoryBtn">Add</button>
+              <button type="button" id="cancelCustomCategoryBtn">Cancel</button>
+            </div>
+            <button type="button" id="deleteCustomCategoryBtn" style="display:none">Delete custom category</button>
+          </div>
+          <div class="form-col">
+            <label for="date">Date:</label>
+            <input type="date" id="date" placeholder="Enter date" />
+          </div>
         </div>
-        <button type="button" id="deleteCustomCategoryBtn" style="display:none">Delete custom category</button>
-
-        <label for="date">Date:</label>
-        <input type="date" id="date" placeholder="Enter date" />
 
         <label for="note">Note:</label>
         <input type="text" id="note" placeholder="Enter note" />
